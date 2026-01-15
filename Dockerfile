@@ -26,13 +26,13 @@ RUN docker-php-ext-enable mysqli
 RUN docker-php-ext-configure gd --with-freetype=/usr --with-jpeg=/usr
 RUN docker-php-ext-install gd
 
-# Copiar raiz
-COPY ./app /var/www/html
-
 # Permission for PHP to write in volumes
 #RUN usermod -u 1000 www-data
 RUN chown -R www-data:www-data /var/www/html
-RUN chmod -R 775 /var/www/html
+RUN chmod -R 777 /var/www/html
+
+# Copiar raiz
+COPY ./app /var/www/html
 
 
 
