@@ -1,0 +1,81 @@
+services:
+  # Aplicação PHP 7.4
+  php-app:
+    #image: php:7.4-apache
+    build:      
+      context: .
+      dockerfile: Dockerfile
+    container_name: php-crud
+    restart: always
+    ports:
+      - "8080:80"
+    volumes:
+      # Corrigido o caminho interno: o Apache busca em /var/www/html
+      - "stackVol-app:/var/www/html"
+    networks:
+      - proxy_app
+    environment:
+      - MYSQL_HOST=db-server
+      - MYSQL_USER=user
+      - MYSQL_PASSWORD=steas@123
+      - MYSQL_DATABASE=app
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.phpapp.rule=Host(`app.stesistemas.com`)"
+      - "traefik.http.routers.phpapp.entrypoints=websecure"
+      - "traefik.http.routers.phpapp.tls=true"
+      - "traefik.http.routers.phpapp.tls.certresolver=le"
+      
+      # INSTRUÇÃO PARA O TRAEFIK:
+      # A imagem php:7.4-apache roda internamente na porta 80
+      - "traefik.http.services.phpapp.loadbalancer.server.port=80"
+      
+    #command: >
+    #  sh -c "docker-php-ext-install pdo pdo_mysql && apache2-foreground"
+      
+
+  # Banco de Dados MySQL
+  db-server:
+    image: mysql:8.0
+    container_name: mysql-db
+    restart: always
+    environment:
+      MYSQL_DATABASE: app
+      MYSQL_USER: user
+      MYSQL_PASSWORD: steas@123
+      MYSQL_ROOT_PASSWORD: root
+    volumes:
+      - "mysql_data:/var/lib/mysql"
+      #- "./docker/mysql/my.cnf:/etc/mysql/conf.d/my.cnf"
+    networks:
+      - proxy_app
+
+  # phpMyAdmin
+  phpmyadmin:
+    image: phpmyadmin:latest
+    container_name: phpmyadmin
+    restart: always
+    ports:
+      - "8081:80"
+    environment:
+      PMA_HOST: db-server
+    networks:
+      - proxy_app
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.pma.rule=Host(`pma.stesistemas.com`)"
+      # ESTA LINHA ABAIXO É A "PORTA" PARA O TRAEFIK:
+      - "traefik.http.services.pma.loadbalancer.server.port=80"
+      - "traefik.http.routers.pma.entrypoints=websecure"
+      - "traefik.http.routers.pma.tls=true"
+      - "traefik.http.routers.pma.tls.certresolver=le"
+      #- "traefik.http.routers.pma.middlewares=auth"
+
+networks:
+  proxy_app:
+    external: true
+volumes:
+  mysql_data:
+    external: true
+  stackVol-app:
+    external: true
