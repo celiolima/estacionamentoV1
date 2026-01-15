@@ -40,7 +40,7 @@ services:
     container_name: mysql-db
     restart: always
     environment:
-      MYSQL_DATABASE: app
+      MYSQL_DATABASE: estacionamento_mysql
       MYSQL_USER: user
       MYSQL_PASSWORD: steas@123
       MYSQL_ROOT_PASSWORD: root
