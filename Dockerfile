@@ -3,36 +3,39 @@ FROM php:7.4-apache
 
 # Copiar seu php.ini
 COPY ./docker/php/php.ini /usr/local/etc/php/php.ini
-
-RUN apt-get update && apt-get install -y --no-install-recommends \
+# Instalar dependências do sistema
+RUN apt-get update && apt-get install -y \
+    libpng-dev \
+    libjpeg-dev \
+    libfreetype6-dev \
+    libzip-dev \
+    zip \
+    unzip \
     git \
     curl \
-    libpng-dev \
-    libonig-dev \
-    libxml2-dev \
-    libzip-dev \
-    libjpeg-dev\
-    libfreetype6-dev\
-    libssl-dev\
-    libicu-dev\
-    default-mysql-client\   
-    unzip
-# Ativa o mod_rewrite do Apache
+    && rm -rf /var/lib/apt/lists/*
+
+# Instalar extensões PHP
+RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
+    && docker-php-ext-install -j$(nproc) gd \
+    && docker-php-ext-install pdo pdo_mysql mysqli zip
+
+# Habilitar mod_rewrite do Apache
 RUN a2enmod rewrite
 
-RUN docker-php-ext-install mysqli pdo pdo_mysql mbstring exif intl zip opcache bcmath soap
-RUN docker-php-ext-enable mysqli
+# Definir diretório de trabalho
+WORKDIR /var/www/html
 
-RUN docker-php-ext-configure gd --with-freetype=/usr --with-jpeg=/usr
-RUN docker-php-ext-install gd
-
-# Permission for PHP to write in volumes
-#RUN usermod -u 1000 www-data
-RUN chown -R www-data:www-data /var/www/html
-RUN chmod -R 777 /var/www/html
 
 # Copiar raiz
-COPY ./app /var/www/html
+COPY ./app/ /var/www/html
 
+# Configurar permissões
+RUN chown -R www-data:www-data /var/www/html \
+    && chmod -R 755 /var/www/html
 
+# Expor porta
+EXPOSE 80
+
+CMD ["apache2-foreground"]
 
