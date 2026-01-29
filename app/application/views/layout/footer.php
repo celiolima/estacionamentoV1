@@ -64,7 +64,11 @@
 </div>
 
 <script src="<?php echo base_url('/public/src/js/vendor/modernizr2.8.3.min.js'); ?>"></script>
-<script src="<?php echo base_url('/public/src/js/vendor/jquery3.3.1.min.js'); ?>"></script>
+<!-- <script src="<?php echo base_url('/public/src/js/vendor/jquery3.3.1.min.js'); ?>"></script> -->
+<script
+    src="https://code.jquery.com/jquery-3.7.1.slim.min.js"
+    integrity="sha256-kmHvs0B+OpCW5GVHUNjv9rOmY0IvSIRcf7zGUDTDQM8="
+    crossorigin="anonymous"></script>
 <script src="<?php echo base_url('/public/plugins/popper.js/dist/umd/popper.min.js'); ?>"></script>
 <script src="<?php echo base_url('/public/plugins/bootstrap/dist/js/bootstrap.min.js'); ?>"></script>
 <script src="<?php echo base_url('/public/plugins/perfect-scrollbar/dist/perfect-scrollbar.min.js'); ?>"></script>
